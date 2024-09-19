@@ -66,15 +66,26 @@ void draw_mandel(struct Rectangle rec) {
 	}
 }
 
+void rect_scale_at_point(Rectangle *rect, float scale, Vector2 point) {
+	rect->x *= scale;
+	rect->y *= scale;
+	rect->x += (1 - scale) * point.x;
+	rect->y -= (1 - scale) * point.y;
+	rect->width *= scale;
+	rect->height *= scale;
+}
+
 int main() {
 	InitWindow(POINTS, POINTS, "Mandelbrot set");
 
-	draw_mandel((struct Rectangle) {
+	struct Rectangle cartesian_area = {
 		.x = -1.5,
 		.y = -1,
 		.width = 2,
 		.height = 2,
-	});
+	};
+	
+	draw_mandel(cartesian_area);
 
 	struct Image img = {
 		.data = &fb,
@@ -87,6 +98,17 @@ int main() {
 	struct Texture text = LoadTextureFromImage(img);
 
 	while(!WindowShouldClose()) {
+		
+		struct Vector2 c_mouse = screen_to_cartesian(GetMousePosition(), cartesian_area);
+		float wheel;
+
+		if ((wheel = GetMouseWheelMove()) != 0) {
+			float scale = wheel > 0 ? 0.9 : 1.1;
+			rect_scale_at_point(&cartesian_area, scale, c_mouse);
+			draw_mandel(cartesian_area);
+			UpdateTexture(text, fb);
+		}
+
 		BeginDrawing();
 		{
 			DrawTexture(text, 0, 0, WHITE);
