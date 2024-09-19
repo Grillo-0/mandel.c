@@ -42,13 +42,24 @@ uint64_t test(double complex c) {
 	return i;
 }
 
+struct Vector2 screen_to_cartesian(const struct Vector2 point,
+				   const struct Rectangle cartesian_drawing_area) {
+	struct Vector2 ret = {
+		.x = point.x * cartesian_drawing_area.width / POINTS + cartesian_drawing_area.x,
+		.y = point.y * cartesian_drawing_area.height / POINTS + cartesian_drawing_area.y,
+	};
+
+	ret.y *= -1;
+
+	return ret;
+}
+
 void draw_mandel(struct Rectangle rec) {
 	for(size_t y = 0; y < POINTS; y++) {
 		for(size_t x = 0; x < POINTS; x++) {
-			double x_c = x * rec.width / POINTS + rec.x;
-			double y_c = y * rec.height / POINTS + rec.y;
+			struct Vector2 coords = screen_to_cartesian((struct Vector2){x, y}, rec);
 
-			uint8_t tries = test(x_c + y_c * I);
+			uint8_t tries = test(coords.x + coords.y * I);
 
 			fb[x + y * POINTS] = ARGB(0xff, tries, tries, tries);
 		}
