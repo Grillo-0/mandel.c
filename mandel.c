@@ -18,15 +18,6 @@
 
 #define TRIES 256
 
-#define X_MIN -1.5
-#define X_MAX 0.5
-
-#define Y_MIN -1.0
-#define Y_MAX 1.0
-
-#define X_RANGE (X_MAX - X_MIN)
-#define Y_RANGE (Y_MAX - Y_MIN)
-
 #define ARGB(a, r, g, b) ( \
 		((a) & 0xff) << (8 * 3) | \
 		((b) & 0xff) << (8 * 2) | \
@@ -51,10 +42,14 @@ uint64_t test(double complex c) {
 	return i;
 }
 
-void draw_mandel() {
+void draw_mandel(struct Rectangle rec) {
 	for(size_t y = 0; y < POINTS; y++) {
 		for(size_t x = 0; x < POINTS; x++) {
-			uint8_t tries = test(((double)x * X_RANGE / POINTS + X_MIN) + ((double)y * Y_RANGE / POINTS + Y_MIN) * I);
+			double x_c = x * rec.width / POINTS + rec.x;
+			double y_c = y * rec.height / POINTS + rec.y;
+
+			uint8_t tries = test(x_c + y_c * I);
+
 			fb[x + y * POINTS] = ARGB(0xff, tries, tries, tries);
 		}
 	}
@@ -63,7 +58,12 @@ void draw_mandel() {
 int main() {
 	InitWindow(POINTS, POINTS, "Mandelbrot set");
 
-	draw_mandel();
+	draw_mandel((struct Rectangle) {
+		.x = -1.5,
+		.y = -1,
+		.width = 2,
+		.height = 2,
+	});
 
 	struct Image img = {
 		.data = &fb,
