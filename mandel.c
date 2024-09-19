@@ -54,9 +54,8 @@ uint64_t test(double complex c) {
 void draw_mandel() {
 	for(size_t y = 0; y < POINTS; y++) {
 		for(size_t x = 0; x < POINTS; x++) {
-			double tries = test(((double)x * X_RANGE / POINTS + X_MIN) + ((double)y * Y_RANGE / POINTS + Y_MIN) * I);
-			uint8_t i = 0xff * (sig((tries - TRIES / 2) / (TRIES / 8.0)));
-			fb[x + y * POINTS] = ARGB(0xff, i, i, i);
+			uint8_t tries = test(((double)x * X_RANGE / POINTS + X_MIN) + ((double)y * Y_RANGE / POINTS + Y_MIN) * I);
+			fb[x + y * POINTS] = ARGB(0xff, tries, tries, tries);
 		}
 	}
 }
